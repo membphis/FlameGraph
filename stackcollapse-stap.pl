@@ -50,11 +50,28 @@
 # 16-Feb-2012	Brendan Gregg	Created this.
 
 use strict;
+use Encode;
 
 my %collapsed;
 
+sub is_utf8 {
+	my ($str) = @_;
+
+	eval "decode( 'utf8', \$str, Encode::FB_CROAK )";
+	if ( $@ ) {
+	   	return 0;
+	}
+
+	1;
+}
+
 sub remember_stack {
 	my ($stack, $count) = @_;
+
+	if (!is_utf8($stack)) {
+		return;
+	}
+
 	$collapsed{$stack} += $count;
 }
 
